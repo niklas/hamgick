@@ -1,0 +1,10 @@
+/coverage
+.*.swp
+.*.swo
+/doc
+db/*sql
+db/schema.rb
+config/database.yml
+/log
+/tmp
+public/system
