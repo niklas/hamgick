@@ -1,6 +1,11 @@
-%image
-  %circle{:radius => 120}
-  %circle{:radius => 60, :x => 30, :x => 30}
-    %color{:foreground => 'red'}
-      %circle{:radius => 60, :x => 60, :x => 60}
-  %circle{:radius => 60, :x => 90, :x => 90}
+- image :width => 120, :height => 120 do
+  - draw do
+    - circle :radius => 50, :x => 60, :y => 60
+    - color :foreground => 'blue' do
+      - circle  :radius => 23, :x => 30, :y => 30
+    - color :foreground => 'yellow' do
+      - circle :radius => 23, :x => 60, :y => 60 do
+        - color :foreground => 'red' do
+          - circle  :radius => 5, :x => 60, :y => 60
+
+    - circle :radius => 23, :x => 90, :y => 90

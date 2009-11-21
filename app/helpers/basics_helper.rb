@@ -19,13 +19,26 @@ module BasicsHelper
     @draw.draw(@image)
   end
 
-  def circle(opts={})
+  def color(opts={}, &block)
+    if fg = opts[:foreground] || opts[:stroke]
+      @draw.stroke(fg)
+    end
+    if fill = opts[:fill]
+      @draw.fill(fill)
+    end
+    block.call
+  end
+
+  def circle(opts={}, &block)
     opts = opts.dup.reverse_merge({
+      :radius => 16,
+      :x => 32, :y => 32
     })
-    origin_x = 32
-    origin_y = 32
-    perim_x  = 23
-    perim_y  = 23
+    origin_x = opts[:x]
+    origin_y = opts[:y]
+    perim_x  = opts[:x] - opts[:radius]
+    perim_y  = opts[:y]
     @draw.circle(origin_x, origin_y, perim_x, perim_y)
+    block.call if block_given?
   end
 end
