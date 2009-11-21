@@ -1,0 +1,17 @@
+grammar Hamgick
+  rule line
+    indention* tag
+  end
+
+  rule indention
+    '  '
+  end
+
+  rule tag
+    "%" command
+  end
+
+  rule command
+     [a-z]+ 
+  end
+end
