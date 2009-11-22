@@ -25,30 +25,23 @@ grammar Hamgick
   end
 
   rule draw
-    '%draw' newline indention indention circle {
+    '%draw' newline indention indention draw_command {
       def draw(image)
         @draw = Magick::Draw.new
-        if respond_to?(:circle)
-          circle.draw(@draw) 
+        if respond_to?(:draw_command)
+          draw_command.render(@draw) 
           @draw.draw(image)
         end
       end
     }
   end
 
+  rule draw_command
+  '%' name:[a-z]+ <DrawCommandNode>
+  end
+
   rule circle
     '%circle' {
-      def draw(draw, opts={})
-        opts = opts.dup.reverse_merge({
-          :radius => 16,
-          :x => 32, :y => 32
-        })
-        origin_x = opts[:x]
-        origin_y = opts[:y]
-        perim_x  = opts[:x] - opts[:radius]
-        perim_y  = opts[:y]
-        draw.circle(origin_x, origin_y, perim_x, perim_y)
-      end
     }
   end
 
