@@ -1,6 +1,31 @@
 grammar Hamgick
+  rule root
+    '%image' {
+      def render(opts={})
+        image(opts).to_blob
+      end
+
+      def image(opts={})
+        opts = opts.dup.reverse_merge({
+          :width => 64,
+          :height => 64,
+          :background_color => 'green'
+        })
+        @image = Magick::Image.new(opts[:width], opts[:height]) do
+          self.background_color = opts[:background_color]
+          self.format = 'png'
+        end
+        @image
+      end
+    }
+  end
+
+  rule next_line_plus_indent
+    [\n] indention
+  end
+
   rule line
-    indention* tag
+    indention* tag newline?
   end
 
   rule indention
@@ -8,10 +33,34 @@ grammar Hamgick
   end
 
   rule tag
-    "%" command
+    "%" command <CommandNode>
   end
 
   rule command
+    command_with_child / command_without_child
+  end
+
+  rule command_with_child
+    full_command {
+      def compile(context)
+        STDERR.puts command_name
+      end
+    }
+  end
+
+  rule command_without_child
+    full_command {
+      def compile(context)
+        STDERR.puts command_name
+      end
+    }
+  end
+
+  rule full_command
      [a-z]+ 
+  end
+
+  rule newline
+    [\n]
   end
 end

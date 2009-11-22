@@ -9,15 +9,21 @@ describe "Parsing Hamgick" do
     parser.parse(input)
   end
 
+  def render(input)
+    parse(input).image.display
+  end
+
   before( :all ) do
     Treetop.load 'lib/hamgick'
   end
 
-  it "should recognize single command" do
-    parse('%foo').should_not be_nil
+  it "should render image" do
+    render('%image').should be_true
   end
-  it "should recognize single command with leading spaces" do
-    parse('  %foo').should_not be_nil
+  it "should build image with circle" do
+    pending "whitespace indention"
+    @text = "%image\n  %circle"
+    parse(@text).should_not be_nil
   end
   
 end
