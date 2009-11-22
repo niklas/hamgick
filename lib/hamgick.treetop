@@ -16,7 +16,7 @@ grammar Hamgick
           self.format = 'png'
         end
         if respond_to?(:draw)
-          draw.draw(@image) 
+          draw.render(@image) 
         end
         @image
       end
@@ -25,7 +25,7 @@ grammar Hamgick
 
   rule draw
     '%draw' newline indention indention draw_command {
-      def draw(image)
+      def render(image)
         @draw = Magick::Draw.new
         if respond_to?(:draw_command)
           draw_command.render(@draw) 
@@ -36,7 +36,7 @@ grammar Hamgick
   end
 
   rule draw_command
-  '%' name:[a-z]+ <DrawCommandNode>
+    '%' name:[a-z]+ <DrawCommandNode>
   end
 
   rule next_line_plus_indent
