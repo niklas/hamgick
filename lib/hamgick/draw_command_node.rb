@@ -3,7 +3,12 @@ module Hamgick
     attr_accessor :draw
     def render(draw, opts={})
       self.draw = draw
-      send(name.text_value, opts)
+      method_name = name.text_value
+      if respond_to?(method_name)
+        send(method_name, opts)
+      else
+        raise "do not know how to draw #{method_name}"
+      end
     end
     def circle(opts={})
       opts = opts.dup.reverse_merge({

@@ -16,7 +16,6 @@ grammar Hamgick
           self.format = 'png'
         end
         if respond_to?(:draw)
-          STDERR.print "D"
           draw.draw(@image) 
         end
         @image
@@ -40,11 +39,6 @@ grammar Hamgick
   '%' name:[a-z]+ <DrawCommandNode>
   end
 
-  rule circle
-    '%circle' {
-    }
-  end
-
   rule next_line_plus_indent
     [\n] indention
   end
@@ -55,10 +49,6 @@ grammar Hamgick
 
   rule indention
     '  '
-  end
-
-  rule tag
-    "%" command <CommandNode>
   end
 
   rule command
