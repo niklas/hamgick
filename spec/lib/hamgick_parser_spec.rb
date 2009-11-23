@@ -37,10 +37,24 @@ describe "Parsing Hamgick" do
     RenderedImage.new
   end
 
+  def draw_mock
+    return @draw_mock if @draw_mock
+    @draw_mock = mock(
+      :draw => true
+    )
+    Magick::Draw.stub!(:new).and_return(@draw_mock)
+    @draw_mock
+  end
+
+  def should_draw(something)
+    draw_mock.should_receive(something)
+  end
+
   #it "should render image" do
   #  render('%image').should be_true
   #end
   it "should render image with circle" do
+    should_draw(:circle)
     code = <<EOHAM
 %image
   %draw
@@ -51,6 +65,7 @@ EOHAM
 
   it "should render image with two circles" do
     pending "multiple commands in same column"
+    should_draw(:circle).twice
     code = <<EOHAM
 %image
   %draw
