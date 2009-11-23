@@ -4,9 +4,10 @@ class RenderedImage
   end
 
   def matches?(code)
+    @code = code
     @parser = HamgickParser.new
     @parsed = @parser.parse(code)
-    @image  = @parsed.image
+    @image  = @parsed.image if @parsed
     @image.is_a?(Magick::Image)
   end
 
@@ -40,7 +41,23 @@ describe "Parsing Hamgick" do
   #  render('%image').should be_true
   #end
   it "should render image with circle" do
-    "%image\n  %draw\n    %circle".should render_an_image
+    code = <<EOHAM
+%image
+  %draw
+    %circle
+EOHAM
+    code.chomp.should render_an_image
+  end
+
+  it "should render image with two circles" do
+    pending "multiple commands in same column"
+    code = <<EOHAM
+%image
+  %draw
+    %circle
+    %circle
+EOHAM
+    code.chomp.should render_an_image
   end
   
 end
