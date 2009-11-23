@@ -3,6 +3,7 @@
 .*.swo
 /doc
 db/*sql
+db/*sqlite3
 db/schema.rb
 config/database.yml
 /log
