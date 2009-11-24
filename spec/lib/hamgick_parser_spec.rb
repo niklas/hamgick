@@ -4,12 +4,12 @@ describe "Parsing Hamgick" do
   def parser
     @parser ||= HamgickParser.new
   end
-  def parse(input)
+  def parse(input=@code)
     parser.parse(input)
   end
 
-  def render(input)
-    parse(input)
+  def render(input=@code)
+    parse(input).render
   end
 
   before( :all ) do
@@ -40,43 +40,84 @@ describe "Parsing Hamgick" do
     environment_mock.should_receive("stroke=").with(settings)
   end
 
-  #it "should render image" do
-  #  render('%image').should be_true
-  #end
-  it "should render image with circle" do
-    should_draw(:circle)
-    code = <<EOHAM
+  describe "with every valid input", :shared => true do
+    it "should get a parse tree" do
+      parsed = parse(@code.chomp)
+      parsed.should be_a(Treetop::Runtime::SyntaxNode)
+    end
+    it "should render an image" do
+      @code.chomp.should render_an_image
+    end
+    
+  end
+
+  describe "image" do
+    before( :each ) do
+      @code = '%image'
+    end
+    it_should_behave_like 'with every valid input'
+  end
+
+  describe "image with circle" do
+    before( :each ) do
+      @code = <<EOHAM
 %image
   %draw
     %circle
 EOHAM
-    code.chomp.should render_an_image
+    end
+
+    it_should_behave_like 'with every valid input'
+
+    it "should draw a circle" do
+      should_draw(:circle)
+      render
+    end
+    
   end
 
-  it "should render image with with colored circle" do
-    pending "really commands and %stroke"
-    should_change_stroke_to(:color => 'red').ordered
-    should_draw(:circle).ordered
-    code = <<EOHAM
+  describe "imge with colored circle" do
+    before( :each ) do
+      @code = <<EOHAM
 %image
   %draw
     %stroke{:color => 'red'}
       %circle
 EOHAM
-    code.chomp.should render_an_image
+    end
+      
+    it_should_behave_like 'with every valid input'
+
+    it "should set color and draw a circle" do
+      pending "really commands and %stroke"
+      should_change_stroke_to(:color => 'red').ordered
+      should_draw(:circle).ordered
+      render
+    end
+    
   end
 
-  it "should render image with two circles" do
-    pending "multiple commands in same column"
-    should_draw(:circle).twice
-    code = <<EOHAM
-%image
-  %draw
-    %circle
-    %circle
+
+  describe "image with 2 circles" do
+    before( :each ) do
+      @code = <<EOHAM
+  %image
+    %draw
+      %circle
+      %circle
 EOHAM
-    code.chomp.should render_an_image
+    end
+
+    it_should_behave_like 'with every valid input'
+
+    it "should draw 2 circles" do
+      pending "multiple commands in same column"
+      should_draw(:circle).twice
+      render
+    end
+    
   end
+
   
 end
 
