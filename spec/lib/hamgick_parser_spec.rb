@@ -39,15 +39,26 @@ describe "Parsing Hamgick" do
 
   def draw_mock
     return @draw_mock if @draw_mock
-    @draw_mock = mock(
+    @draw_mock = stub('Magick::Draw',
       :draw => true
     )
     Magick::Draw.stub!(:new).and_return(@draw_mock)
     @draw_mock
   end
 
+  def environment_mock
+    return @environment_mock if @environment_mock
+    @environment_mock = stub('Hamgick::Environment')
+    Hamgick::Environment.stub!(:new).and_return(@environment_mock)
+    @environment_mock
+  end
+
   def should_draw(something)
     draw_mock.should_receive(something)
+  end
+
+  def should_change_stroke_to(settings)
+    environment_mock.should_receive("stroke=").with(settings)
   end
 
   #it "should render image" do
@@ -59,6 +70,19 @@ describe "Parsing Hamgick" do
 %image
   %draw
     %circle
+EOHAM
+    code.chomp.should render_an_image
+  end
+
+  it "should render image with with colored circle" do
+    pending "really commands and %stroke"
+    should_change_stroke_to(:color => 'red').ordered
+    should_draw(:circle).ordered
+    code = <<EOHAM
+%image
+  %draw
+    %stroke{:color => 'red'}
+      %circle
 EOHAM
     code.chomp.should render_an_image
   end
