@@ -7,7 +7,7 @@ module HamgickSpecHelper
       @code = code
       @parser = HamgickParser.new
       @parsed = @parser.parse(code)
-      @image  = @parsed.render if @parsed
+      @image  = @parsed.image if @parsed
       @image.is_a?(Magick::Image)
     end
 

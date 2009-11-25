@@ -8,6 +8,11 @@ module Hamgick
     def self.start(attrs={})
       @@stack.clear
       @@stack << new.merge(attrs)
+      last
+    end
+
+    def self.last
+      @@stack.last
     end
 
     def image

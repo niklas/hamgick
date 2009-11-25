@@ -2,9 +2,15 @@ grammar Hamgick
   rule line
     leading_indentation:(indentation*) 
     command optional_space newline? 
-    next_indentation:(indentation*) line? {
-      def render(env = Environment.start)
-        command.render(env)
+    next_indentation:(indentation*) next_line:line? {
+      def render
+        image.to_blob
+      end
+      def image
+        environment.image
+      end
+      def environment
+        @environment ||= Environment.last || Environment.start
       end
     }
   end
@@ -12,7 +18,7 @@ grammar Hamgick
   rule command
     '%' command_name options? {
       def render(env)
-        "command did something"
+        "command '#{command_name.text_value}' did something"
       end
     }
   end
@@ -35,14 +41,6 @@ grammar Hamgick
 
   rule fixnum
     [+-]? [\d]+
-  end
-
-  rule rot
-    '%image' newline indention draw  {
-      def render(opts={})
-        image(opts).to_blob
-      end
-    }
   end
 
   rule draw
