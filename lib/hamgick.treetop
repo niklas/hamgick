@@ -1,16 +1,20 @@
 grammar Hamgick
-  rule root
-    line
-  end
-
   rule line
     leading_indentation:(indentation*) 
     command optional_space newline? 
-    next_indentation:(indentation*) line?
+    next_indentation:(indentation*) line? {
+      def render(env = Environment.start)
+        command.render(env)
+      end
+    }
   end
 
   rule command
-    '%' command_name options?
+    '%' command_name options? {
+      def render(env)
+        "command did something"
+      end
+    }
   end
 
   rule options
@@ -37,22 +41,6 @@ grammar Hamgick
     '%image' newline indention draw  {
       def render(opts={})
         image(opts).to_blob
-      end
-
-      def image(opts={})
-        opts = opts.dup.reverse_merge({
-          :width => 64,
-          :height => 64,
-          :background_color => 'green'
-        })
-        @image = Magick::Image.new(opts[:width], opts[:height]) do
-          self.background_color = opts[:background_color]
-          self.format = 'png'
-        end
-        if respond_to?(:draw)
-          draw.render(@image) 
-        end
-        @image
       end
     }
   end

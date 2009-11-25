@@ -9,7 +9,6 @@ describe "Parsing Hamgick" do
   end
 
   def render(input=@code)
-    return nil # disabled
     parse(input).render
   end
 
@@ -45,9 +44,9 @@ describe "Parsing Hamgick" do
     it "should get a parse tree" do
       @code.chomp.should be_valid_hamgick
     end
-    #it "should render an image" do
-    #  @code.chomp.should render_an_image
-    #end
+    it "should render an image" do
+      @code.chomp.should render_an_image
+    end
     
   end
 
