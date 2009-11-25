@@ -1,4 +1,38 @@
 grammar Hamgick
+  rule root
+    line
+  end
+
+  rule line
+    leading_indentation:(indentation*) 
+    command optional_space newline? 
+    next_indentation:(indentation*) line?
+  end
+
+  rule command
+    '%' command_name options?
+  end
+
+  rule options
+    '{' optional_space 
+    options_key optional_space
+    '=>' optional_space
+    (string/fixnum) optional_space
+    '}'
+  end
+
+  rule options_key
+    ':' [a-zA-Z]+
+  end
+
+  rule string
+    ['] [^']* [']
+  end
+
+  rule fixnum
+    [+-]? [\d]+
+  end
+
   rule rot
     '%image' newline indention draw  {
       def render(opts={})
@@ -43,39 +77,23 @@ grammar Hamgick
     [\n] indention
   end
 
-  rule line
-    indention* tag newline?
+  rule indention
+    indentation
   end
 
-  rule indention
+  rule indentation
     '  '
   end
 
-  rule command
-    command_with_child / command_without_child
-  end
-
-  rule command_with_child
-    full_command {
-      def compile(context)
-        STDERR.puts command_name
-      end
-    }
-  end
-
-  rule command_without_child
-    full_command {
-      def compile(context)
-        STDERR.puts command_name
-      end
-    }
-  end
-
-  rule full_command
+  rule command_name
      [a-z]+ 
   end
 
   rule newline
     [\n]
+  end
+
+  rule optional_space
+    [\s]*
   end
 end
