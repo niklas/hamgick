@@ -3,11 +3,16 @@ grammar Hamgick
     leading_indentation:(indentation*) 
     command optional_space newline? 
     next_indentation:(indentation*) next_line:line? {
-      def render
+      def render(env=environment)
         image.to_blob
       end
       def image
-        environment.image
+        image = environment.image
+        if next_line.respond_to?(:render)
+          "R"
+          next_line.render(environment)
+        end
+        [leading_indentation.text_value, next_indentation.text_value].map(&:length).join(' => ')
       end
       def environment
         @environment ||= Environment.last || Environment.start

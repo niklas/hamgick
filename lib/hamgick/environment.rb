@@ -7,12 +7,20 @@ module Hamgick
 
     def self.start(attrs={})
       @@stack.clear
+      push(attrs)
+    end
+
+    def self.push(attrs={})
       @@stack << new.merge(attrs)
       last
     end
 
     def self.last
       @@stack.last
+    end
+
+    def self.size
+      @@stack.size
     end
 
     def image
@@ -37,11 +45,10 @@ module Hamgick
         :height => 64,
         :background_color => 'green'
       })
-      image = Magick::Image.new(opts[:width], opts[:height]) do
+      Magick::Image.new(opts[:width], opts[:height]) do
         self.background_color = opts[:background_color]
         self.format = 'png'
       end
-      image
     end
 
   end
