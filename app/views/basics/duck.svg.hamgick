@@ -1,50 +1,45 @@
-%rvg 2.5.in, 2.5.in
-  - viewbox 0, 0, 250, 250
-  - background_fill 'white'
-  %translate 100, 150
-    %rotate -30
-    %styles :fill => 'yellow', :stroke => 'black', :stroke_width => 2
-      %ellipse 50,30
-      %rect 45, 20, -20, -10
-        - styles :fill => 'orange'
-  %translate 130, 83
-    %styles
-      :stroke 'black'
-      :stroke_width 2
-      %circle 30
-        - styles fill 'yello'
-      %circle 5, 10, -5
-        - styles fill 'black'
-       %polygon 30,0, 70,5, 30,10, 62,25, 23,20
-        - styles fill 'orange'
-  $foot=
-    %path 'm0,0 v30 l30,10 l5,-10, l-5,-10 l-30,10z'
-      - styles 
-        :stroke_width 2
-        :fill 'orange'
-        :stroke 'black'
-  $foot
-    - translate 75, 188
-    - rotate 15
-  $foot
-    - translate 100, 185
-    - rotate -15
+rvg 2.5.in, 2.5.in
+  viewbox 0, 0, 250, 250
+  background_fill 'white'
+  translate 100, 150
+    rotate -30
+    styles :fill => 'yellow', :stroke => 'black', :stroke_width => 2
+      ellipse 50,30
+      rect 45, 20, -20, -10
+        fill 'orange'
+  translate 130, 83
+    stroke 'black'
+    stroke_width 2
+    circle 30
+      fill 'yello'
+    circle 5, 10, -5
+      fill 'black'
+     polygon 30,0, 70,5, 30,10, 62,25, 23,20
+      fill 'orange'
+  foot=
+    path 'm0,0 v30 l30,10 l5,-10, l-5,-10 l-30,10z'
+      stroke_width 2
+      fill 'orange'
+      stroke 'black'
+  foot
+    translate 75, 188
+    rotate 15
+  foot
+    translate 100, 185
+    rotate -15
 
-  %text 125, 30
-    %tspan "duck|"
-      - styles
-        :text_anchor 'end'
-        :font_size 20
-        :font_family 'helvetica'
-        :fill 'black'
-    %tspan "type"
-      - styles 
-        :font_size 22
-        :font_family 'times'
-        :font_style 'italic'
-        :fill 'red'
-  %rect 249, 249
-    - styles
-      :stroke 'blue'
-      :fill 'none'
+  text 125, 30
+    tspan "duck|"
+      text_anchor 'end'
+      font_size 20
+      font_family 'helvetica'
+      fill 'black'
+    tspan "type"
+      font_size 22
+      font_family 'times'
+      font_style 'italic'
+      fill 'red'
+  rect 249, 249
+    stroke 'blue'
+    fill 'none'
 
