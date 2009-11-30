@@ -1,0 +1,23 @@
+grammar Options
+
+  rule options
+    '{' optional_space 
+    options_key optional_space
+    '=>' optional_space
+    (string/fixnum) optional_space
+    '}'
+  end
+
+  rule options_key
+    ':' [a-zA-Z]+
+  end
+
+  rule string
+    ['] [^']* [']
+  end
+
+  rule fixnum
+    [+-]? [\d]+
+  end
+
+end

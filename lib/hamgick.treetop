@@ -1,64 +1,18 @@
 grammar Hamgick
-  rule line
-    leading_indentation:(indentation*) 
-    command optional_space newline? 
-    next_indentation:(indentation*) next_line:line? {
-      def render(env=environment)
-        image.to_blob
-      end
-      def image
-        image = environment.image
-        if next_line.respond_to?(:render)
-          "R"
-          next_line.render(environment)
-        end
-        [leading_indentation.text_value, next_indentation.text_value].map(&:length).join(' => ')
-      end
-      def environment
-        @environment ||= Environment.last || Environment.start
+
+  rule root
+    "rvg" newline
+    indentation "viewbox" newline
+    indentation "background_fill" newline?  {
+      require 'rvg/rvg'
+      Magick::RVG.dpi = 90
+      def render
+        rvg = Magick::RVG.new(2.5.in, 2.5.in)
+        rvg.draw
       end
     }
   end
 
-  rule command
-    '%' command_name options? {
-      def render(env)
-        "command '#{command_name.text_value}' did something"
-      end
-    }
-  end
-
-  rule options
-    '{' optional_space 
-    options_key optional_space
-    '=>' optional_space
-    (string/fixnum) optional_space
-    '}'
-  end
-
-  rule options_key
-    ':' [a-zA-Z]+
-  end
-
-  rule string
-    ['] [^']* [']
-  end
-
-  rule fixnum
-    [+-]? [\d]+
-  end
-
-  rule draw
-    '%draw' newline indention indention draw_command {
-      def render(image)
-        @draw = Magick::Draw.new
-        if respond_to?(:draw_command)
-          draw_command.render(@draw) 
-          @draw.draw(image)
-        end
-      end
-    }
-  end
 
   rule draw_command
     '%' name:[a-z]+ <DrawCommandNode>
@@ -66,10 +20,6 @@ grammar Hamgick
 
   rule next_line_plus_indent
     [\n] indention
-  end
-
-  rule indention
-    indentation
   end
 
   rule indentation
