@@ -1,0 +1,6 @@
+STDERR.puts "watching for grammars"
+Autotest.add_hook :initialize do |at|
+  at.add_mapping(%r%^lib/(.*)\.treetop$%) { |_, m|
+    ["spec/lib/#{m[1]}_parser_spec.rb"]
+  }
+end
