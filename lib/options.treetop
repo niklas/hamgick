@@ -1,23 +1,32 @@
 grammar Options
 
   rule options
-    '{' optional_space 
-    options_key optional_space
-    '=>' optional_space
-    (string/fixnum) optional_space
-    '}'
+    options_key [\s]*
+    '=>' [\s]*
+    (argument) [\s]*
   end
 
   rule options_key
-    ':' [a-zA-Z]+
+    ':' [a-zA-Z_\d]+
   end
 
-  rule string
-    ['] [^']* [']
+  rule arguments
+    argument [\s]* "," [\s]* arguments
+    /
+    argument
   end
+
+  rule argument
+    fixnum
+  end
+
 
   rule fixnum
     [+-]? [\d]+
+  end
+
+  rule string
+    "'" [a-zA-Z]* "'"
   end
 
 end

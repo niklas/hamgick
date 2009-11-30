@@ -17,6 +17,7 @@ describe "Parsing Hamgick" do
   end
 
   before( :all ) do
+    Treetop.load 'lib/options'
     Treetop.load 'lib/hamgick'
   end
 
@@ -56,6 +57,8 @@ describe "Parsing Hamgick" do
     Magick::RVG.should_receive(:new).and_return(rvg_mock(:draw => true))
     render
   end
+
+  it "should accept random newlines"
 
   
 end

@@ -1,7 +1,9 @@
 grammar Hamgick
 
+  include Options
+
   rule root
-    "rvg" newline line? {
+    "rvg" newline (line newline)* {
       require 'rvg/rvg'
       Magick::RVG.dpi = 90
       def render
@@ -12,33 +14,21 @@ grammar Hamgick
   end
 
   rule line
-    indentation command (newline line)? / (optional_space newline)?
+    [\s]* &(newline)
+    /
+    indentation+ command
   end
 
   rule command
-    command_name [\s]+ list_of_arguments 
-  end
-
-  rule list_of_arguments
-    argument [\s]* "," [\s]* list_of_arguments
-    /
-    argument
-  end
-
-  rule argument
-    fixnum / string
-  end
-
-  rule string
-    "'" [^']* "'"
-  end
-
-  rule fixnum
-    [\d]+
+    command_name "="? [\s]+ (ruby_until_eol)?
   end
 
   rule indentation
     "  "
+  end
+
+  rule ruby_until_eol
+    [^\n]+
   end
 
   rule command_name
@@ -49,7 +39,4 @@ grammar Hamgick
     [\n]
   end
 
-  rule optional_space
-    [\s]*
-  end
 end
