@@ -1,9 +1,7 @@
 grammar Hamgick
 
   rule root
-    "rvg" newline
-    indentation "viewbox" newline
-    indentation "background_fill" newline?  {
+    "rvg" newline line? {
       require 'rvg/rvg'
       Magick::RVG.dpi = 90
       def render
@@ -13,21 +11,38 @@ grammar Hamgick
     }
   end
 
-
-  rule draw_command
-    '%' name:[a-z]+ <DrawCommandNode>
+  rule line
+    indentation command (newline line)? / (optional_space newline)?
   end
 
-  rule next_line_plus_indent
-    [\n] indention
+  rule command
+    command_name [\s]+ list_of_arguments 
+  end
+
+  rule list_of_arguments
+    argument [\s]* "," [\s]* list_of_arguments
+    /
+    argument
+  end
+
+  rule argument
+    fixnum / string
+  end
+
+  rule string
+    "'" [^']* "'"
+  end
+
+  rule fixnum
+    [\d]+
   end
 
   rule indentation
-    '  '
+    "  "
   end
 
   rule command_name
-     [a-z]+ 
+     [a-z_]+ 
   end
 
   rule newline

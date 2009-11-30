@@ -20,6 +20,10 @@ describe "Parsing Hamgick" do
     Treetop.load 'lib/hamgick'
   end
 
+  before( :each ) do
+    @parser = nil
+  end
+
   def environment_mock
     return @environment_mock if @environment_mock
     @environment_mock = stub('Hamgick::Environment')
@@ -39,15 +43,13 @@ describe "Parsing Hamgick" do
     code.should_not be_blank
   end
 
+
   it "should be parsable" do
-    lambda { @parsed = parse }.should_not raise_error
-    @parsed.should_not be_nil
+    code.should be_valid_hamgick
   end
 
   it "should be renderable" do
-    lambda { @image = render }.should_not raise_error
-    @image.should_not be_blank
-    @image.should be_a(Magick::Image)
+    code.should render_an_image
   end
 
   it "should create a new Magick::RVG" do
