@@ -3,36 +3,78 @@ grammar Hamgick
   include Options
 
   rule root
-    "rvg" newline (line newline)* {
+    "rvg" newline lines:(line newline)* {
       require 'rvg/rvg'
       Magick::RVG.dpi = 90
       def render
-        rvg = Magick::RVG.new(2.5.in, 2.5.in)
+        rvg = Magick::RVG.new(2.5.in, 2.5.in) do |rvg|
+          lines.elements.each do |line_and_newline|
+            line_and_newline.line.render(rvg)
+          end
+        end
         rvg.draw
       end
     }
   end
 
   rule line
-    [\s]* &(newline)
-    /
-    indentation+ command
+    indentation+ action:(command_with_arguments / assignment/ command) next_indentation:&(indentation*) {
+       def render(rvg)
+         action.render(rvg)
+       end
+    }
   end
 
   rule command
-    command_name "="? [\s]+ (ruby_until_eol)?
+    command_name:[a-z_]+ ' '* &[\n] {
+      def render(rvg)
+        rvg.send(command_name.text_value)
+      end
+    }
+  end
+
+  rule command_with_arguments
+    command_name:[a-z_]+ ' '+ list_or_hash {
+      def render(rvg)
+        case v = list_or_hash.value
+        when Array
+          rvg.send(command_name.text_value, *v)
+        else
+          rvg.send(command_name.text_value, v)
+        end
+      end
+    }
+  end
+
+  rule list_or_hash
+    ( ":" [A-Za-z_] space '=>' until_eol) {
+       def value
+         eval %Q~{ #{text_value} }~
+       end
+    }
+    /
+    until_eol {
+       def value
+         eval %Q~[ #{text_value} ]~
+       end
+    }
+  end
+
+  rule until_eol
+    [^\n]*
+  end
+
+
+  rule assignment
+    assignment_name:[a-z_]+ "=" {
+      def render(rvg)
+        STDERR.puts "assigning #{command_name.text_value}"
+      end
+    }
   end
 
   rule indentation
     "  "
-  end
-
-  rule ruby_until_eol
-    [^\n]+
-  end
-
-  rule command_name
-     [a-z_]+ 
   end
 
   rule newline

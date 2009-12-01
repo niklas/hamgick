@@ -1,32 +1,72 @@
 grammar Options
 
-  rule options
-    options_key [\s]*
-    '=>' [\s]*
-    (argument) [\s]*
+  rule manual_options
+    (key_value_pair space ',' space options) {
+       def value
+         key_value_pair.value.merge(options.value)
+       end
+    }
+    /
+    key_value_pair
+  end
+
+  rule key_value_pair
+    options_key space
+    '=>' space 
+    (argument) {
+       def value
+         { options_key.text_value.to_sym => argument.value }
+       end
+    }
   end
 
   rule options_key
     ':' [a-zA-Z_\d]+
   end
 
-  rule arguments
-    argument [\s]* "," [\s]* arguments
+  rule manual_arguments
+    argument space "," space arguments {
+       def value
+         eval %Q~[ #{argument.text_value} ]~ + arguments.value
+       end
+    }
     /
-    argument
+    argument {
+      def value
+        [ argument.value ]
+      end
+    }
   end
 
   rule argument
-    fixnum
+    fixnum / string
   end
 
 
   rule fixnum
-    [+-]? [\d]+
+    sign:[+-]? value:[\d]+ {
+       def value
+         super.text_value.to_i * (sign.text_value == '-' ? -1 : 1)
+       end
+    }
   end
 
   rule string
-    "'" [a-zA-Z]* "'"
+    "'" value:[^'\n]* "'" {
+       def value
+         super.text_value
+       end
+    }
+    /
+    ["] value:[^"\n]* ["] {
+       def value
+         super.text_value
+       end
+    }
+  end
+
+  rule space
+    " "*
   end
 
 end
