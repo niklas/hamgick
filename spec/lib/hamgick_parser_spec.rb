@@ -2,23 +2,19 @@ require File.join( File.dirname(__FILE__), '..', 'spec_helper' )
 describe "Parsing Hamgick" do
 
   def parser
-    @parser ||= HamgickParser.new
+    @parser ||= HamgickParser.new(code)
   end
-  def parse(input=code)
-    parser.parse(input)
+  def compile
+    parser.precompile
   end
 
   def render(input=code)
-    parse(input).render
+    compile
+    parser.render
   end
 
   def code
     @code ||= File.read( File.join(RAILS_ROOT, 'app/views/basics/duck.svg.hamgick')  )
-  end
-
-  before( :all ) do
-    Treetop.load 'lib/options'
-    Treetop.load 'lib/hamgick'
   end
 
   before( :each ) do

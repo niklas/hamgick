@@ -5,14 +5,14 @@ module HamgickSpecHelper
 
     def matches?(code)
       @code = code
-      @parser = HamgickParser.new
-      @parsed = @parser.parse(code)
-      @image  = @parsed.render if @parsed
+      @parser = HamgickParser.new(code)
+      @parser.precompile
+      @image  = @parser.render
       @image.is_a?(Magick::Image)
     end
 
     def failure_message_for_should
-      "expected the following code to create an image (was #{@image.inspect}):\n#{@code}\n----\n#{@parser.failure_reason}"
+      "expected the following code to create an image (was #{@image.inspect}):\n#{@code}\n----\n"
     end
   end
   def render_an_image
@@ -24,13 +24,18 @@ module HamgickSpecHelper
 
     def matches?(code)
       @code = code
-      @parser = HamgickParser.new
-      @parsed = @parser.parse(code)
-      @parsed.is_a?(Treetop::Runtime::SyntaxNode)
+      @parser = HamgickParser.new(code)
+      begin
+        @parser.precompile
+        true
+      rescue Exception => e
+        @exception = e
+        false
+      end
     end
 
     def failure_message_for_should
-      "expected valid Hamgick, #{@parser.failure_reason}\n#{@code}\n"
+      "expected valid Hamgick, #{@exception}\n#{@code}\n"
     end
   end
   def be_valid_hamgick
