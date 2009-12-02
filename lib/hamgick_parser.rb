@@ -3,6 +3,21 @@ class HamgickParser
 
   class Line < Struct.new(:text, :index, :precompiler, :eod)
     alias_method :eod?, :eod
+    attr_reader :command, :arguments_or_options
+
+    def initialize(*args)
+      super
+
+      if text =~ /([\w_]+)\s*(.*)$/
+        @command = $1
+        @arguments_or_options = $2
+      end
+
+    end
+
+    def stripped
+      @stripped ||= text.lstrip
+    end
 
     def tabs
       line = self
@@ -47,7 +62,7 @@ END
     while next_line
       process_indent(@line) unless @line.text.empty?
 
-      process_line(@line.text, @line.index) unless @line.text.empty?
+      process_line(@line) unless @line.text.empty?
 
       if @next_line.tabs - @line.tabs > 1
         raise SyntaxError.new("The line was indented #{@next_line.tabs - @line.tabs} levels deeper than the previous line.", @next_line.index)
@@ -60,12 +75,16 @@ END
   end
 
   def process_indent(line)
-    STDERR.puts "Indent: #{line.tabs}"
   end
 
-  def process_line(text, index)
-    @index = index + 1
-    STDERR.puts "#{index}: #{text}"
+  def process_line(line)
+    @index = line.index + 1
+    case line.command
+    when 'rvg'
+      log "creating RVG"
+    else
+      log "-- unknown command in line #{line.index}: #{line.command}"
+    end
   end
 
 
@@ -101,5 +120,8 @@ END
     @newlines += 1
   end
 
+  def log(text)
+    STDERR.puts text
+  end
 
 end
