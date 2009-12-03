@@ -50,6 +50,7 @@ describe "Parsing Hamgick" do
   end
 
   it "should use Magick::RVG and derivates" do
+
     Magick::RVG.should_receive(:new).and_return( rvg = mock('Magick::RVG', :draw => true) )
     rvg.should_receive(:viewbox).with(0,0,250,250).and_return(rvg)
     rvg.should_receive(:background_fill=).with('white')
@@ -71,6 +72,37 @@ describe "Parsing Hamgick" do
         circle.should_receive(:styles).with(:fill => 'black')
       g2.should_receive(:polygon).with(30,0, 70,5, 30,10, 62,25, 23,20).and_return( polygon = mock('Magick::RVG::Polygon') )
         polygon.should_receive(:styles).with(:fill => 'orange')
+
+    Magick::RVG.should_receive(:new).and_return( foot = mock('Magick::RVG') )
+      foot.should_receive(:path).with('m0,0 v30 l30,10 l5,-10, l-5,-10 l-30,10z').and_return( path = mock('Magick::RVG::Path_foot') )
+        path.should_receive(:styles).with(:stroke_width => 2)
+        path.should_receive(:styles).with(:fill => 'orange')
+        path.should_receive(:styles).with(:stroke => 'black')
+    #env.should_receive(:[]=).with('foot', foot)
+
+    rvg.should_receive(:use).with(foot).and_return( use = mock('Magick::RVG::Use_foot_1') )
+      use.should_receive(:translate).with(75, 188)
+      use.should_receive(:rotate).with(15)
+
+    rvg.should_receive(:use).with(foot).and_return( use = mock('Magick::RVG::Use_foot_2') )
+      use.should_receive(:translate).with(100, 185)
+      use.should_receive(:rotate).with(-15)
+
+    rvg.should_receive(:text).with(125, 30).and_return( text = mock('Magick::RVG::Text') )
+      text.should_receive(:tspan).with("duck|").and_return ( tspan = mock('Magick::RVG::Tspan_1'))
+        tspan.should_receive(:styles).with(:text_anchor => 'end')
+        tspan.should_receive(:styles).with(:font_size => 20)
+        tspan.should_receive(:styles).with(:font_family => 'helvetica')
+        tspan.should_receive(:styles).with(:fill => 'black')
+      text.should_receive(:tspan).with("type").and_return ( tspan = mock('Magick::RVG::Tspan_2'))
+        tspan.should_receive(:styles).with(:font_size => 22)
+        tspan.should_receive(:styles).with(:font_family => 'times')
+        tspan.should_receive(:styles).with(:font_style => 'italic')
+        tspan.should_receive(:styles).with(:fill => 'red')
+
+    rvg.should_receive(:rect).with(249, 249).and_return( rect = mock('Magick::RVG::Rect') )
+      rect.should_receive(:styles).with(:stroke => 'blue')
+      rect.should_receive(:styles).with(:fill => 'none')
 
     render
   end

@@ -113,14 +113,26 @@ END
 
   def process_line(line)
     @index = line.index + 1
-    arguments_or_options = line.evaled_arguments
 
+    raise SyntaxError, "no command found in #{line.index}: #{line.text}" if line.command.nil?
+
+    if line.assign?
+      partial = Magick::RVG.new
+      @environment[line.command.to_sym] = partial
+      push_canvas(partial) if next_line_indented?
+      return
+    end
+
+    arguments_or_options = line.evaled_arguments
     command = line.command.to_sym
     case command
     when :rvg # TODO do it lazy
       @environment.create_canvas
       @template_tabs += 1
       return
+    when *@environment.keys # previously saved partials
+      arguments_or_options.unshift @environment[command]
+      command = :use
     when :group
       command = :g
     when *Magick::RVG::STYLES
@@ -164,7 +176,7 @@ END
     # :eod is a special end-of-document marker
     line =
       if text == :eod
-        Line.new '-#', index, self, true
+        Line.new '', index, self, true
       else
         Line.new text, index, self, false
       end
