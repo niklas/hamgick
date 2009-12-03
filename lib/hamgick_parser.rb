@@ -117,7 +117,7 @@ END
     raise SyntaxError, "no command found in #{line.index}: #{line.text}" if line.command.nil?
 
     if line.assign?
-      partial = Magick::RVG.new
+      partial = Magick::RVG::Group.new
       @environment[line.command.to_sym] = partial
       push_canvas(partial) if next_line_indented?
       return

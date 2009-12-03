@@ -73,7 +73,7 @@ describe "Parsing Hamgick" do
       g2.should_receive(:polygon).with(30,0, 70,5, 30,10, 62,25, 23,20).and_return( polygon = mock('Magick::RVG::Polygon') )
         polygon.should_receive(:styles).with(:fill => 'orange')
 
-    Magick::RVG.should_receive(:new).and_return( foot = mock('Magick::RVG') )
+    Magick::RVG::Group.should_receive(:new).and_return( foot = mock('Magick::RVG::Group_foot') )
       foot.should_receive(:path).with('m0,0 v30 l30,10 l5,-10, l-5,-10 l-30,10z').and_return( path = mock('Magick::RVG::Path_foot') )
         path.should_receive(:styles).with(:stroke_width => 2)
         path.should_receive(:styles).with(:fill => 'orange')
@@ -89,12 +89,12 @@ describe "Parsing Hamgick" do
       use.should_receive(:rotate).with(-15)
 
     rvg.should_receive(:text).with(125, 30).and_return( text = mock('Magick::RVG::Text') )
-      text.should_receive(:tspan).with("duck|").and_return ( tspan = mock('Magick::RVG::Tspan_1'))
+      text.should_receive(:tspan).with("duck|").and_return( tspan = mock('Magick::RVG::Tspan_1'))
         tspan.should_receive(:styles).with(:text_anchor => 'end')
         tspan.should_receive(:styles).with(:font_size => 20)
         tspan.should_receive(:styles).with(:font_family => 'helvetica')
         tspan.should_receive(:styles).with(:fill => 'black')
-      text.should_receive(:tspan).with("type").and_return ( tspan = mock('Magick::RVG::Tspan_2'))
+      text.should_receive(:tspan).with("type").and_return( tspan = mock('Magick::RVG::Tspan_2'))
         tspan.should_receive(:styles).with(:font_size => 22)
         tspan.should_receive(:styles).with(:font_family => 'times')
         tspan.should_receive(:styles).with(:font_style => 'italic')
