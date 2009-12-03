@@ -56,6 +56,20 @@ describe "Parsing Hamgick" do
 
   it "should accept random newlines"
 
+  describe "parsing" do
+    it "should parse arguments"
+    it "should parse options"
+    it "should parse any ruby returning arguments or options"
+    it "should eval this ruby in the @template's context"
+    it "should call the commands on Magick objects"
+    it "should keep a stack of Magick objects"
+    it "should be empty at first"
+    it "should create a new default Magick::RVG instance if no 'rvg' command is found on root of document"
+    it "should call the commands always on the last (current) item on the stack"
+    it "should push the result of a command to the stack if it opens a new block by indention"
+    it "should pop the stack when finding less indented commands"
+    it "should not create groups implicitly"
+  end
   
 end
 
