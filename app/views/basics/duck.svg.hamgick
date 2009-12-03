@@ -1,13 +1,15 @@
 rvg
   viewbox 0, 0, 250, 250
     background_fill 'white'
-    translate 100, 150
+    group
+      translate 100, 150
       rotate -30
       styles :fill => 'yellow', :stroke => 'black', :stroke_width => 2
-        ellipse 50,30
-        rect 45, 20, -20, -10
-          fill 'orange'
-    translate 130, 83
+      ellipse 50,30
+      rect 45, 20, -20, -10
+        fill 'orange'
+    group
+      translate 130, 83
       stroke 'black'
       stroke_width 2
       circle 30
