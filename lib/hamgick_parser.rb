@@ -8,11 +8,19 @@ class HamgickParser
     def initialize(*args)
       super
 
-      if text =~ /([\w_]+)\s*(.*)$/
+      @assign = false
+      if text =~ /([\w_]+=?)\s*(.*)$/
         @command = $1
         @arguments_or_options = $2
+        if @command.ends_with?('=')
+          @command.chop!
+          @assign = true
+        end
       end
+    end
 
+    def assign?
+      @assign
     end
 
     def stripped
@@ -45,6 +53,10 @@ END
     end
   end
 
+  COMMAND = %w( )
+  BLOCK   = %w( translate viewbox )
+  SETTER  = %w( background_fill )
+
   def initialize(template, options = {})
     @options = {
       :format => 'png'
@@ -53,7 +65,8 @@ END
     @template_index = 0
   end
 
-  def precompile
+  def compile
+    @environment = Hamgick::Environment.start
     @newlines = 0
     @line = next_line
     newline
@@ -74,14 +87,44 @@ END
     end
   end
 
+  alias_method :precompile, :compile
+
+  def next_line_indented?
+    @next_line.tabs > @line.tabs
+  end
+
   def process_indent(line)
   end
 
   def process_line(line)
     @index = line.index + 1
+    arguments_or_options = eval_arguments(line.arguments_or_options)
+
     case line.command
     when 'rvg'
-      log "creating RVG"
+      @environment.create_canvas
+    when *BLOCK
+      if arguments_or_options.is_a?(Hash)
+        @environment.canvas.send(line.command, arguments_or_options  ) do |sub|
+          @environment.push(:canvas => sub)
+        end
+      else
+        @environment.canvas.send(line.command, *arguments_or_options  ) do |sub|
+          @environment.push(:canvas => sub)
+        end
+      end
+    when *SETTER
+      if arguments_or_options.is_a?(Hash)
+        @environment.canvas.send("#{line.command}=", arguments_or_options)
+      else
+        @environment.canvas.send("#{line.command}=", *arguments_or_options)
+      end
+    when *COMMAND
+      if arguments_or_options.is_a?(Hash)
+        @environment.canvas.send(line.command, arguments_or_options)
+      else
+        @environment.canvas.send(line.command, *arguments_or_options)
+      end
     else
       log "-- unknown command in line #{line.index}: #{line.command}"
     end
@@ -122,6 +165,15 @@ END
 
   def log(text)
     STDERR.puts text
+  end
+
+  # FIXME poor detection hash vs. array
+  def eval_arguments(string)
+    if string =~ /=>/
+      @environment.instance_eval %Q~{ #{string}  }~
+    else
+      @environment.instance_eval %Q~[ #{string}  ]~
+    end
   end
 
 end
