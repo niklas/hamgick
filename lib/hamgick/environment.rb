@@ -1,3 +1,4 @@
+require 'rvg/rvg'
 module Hamgick
   class Environment < Hash
 
@@ -6,7 +7,7 @@ module Hamgick
 
     def self.start(attrs={})
       @@stack.clear
-      push(attrs)
+      push(attrs.merge(:root => true))
     end
 
     def self.push(attrs={})
@@ -14,8 +15,25 @@ module Hamgick
       last
     end
 
+    def self.empty?
+      @@stack.empty?
+    end
+
+    def self.almost_empty?
+      size == 1
+    end
+
+    def self.pop
+      @@stack.pop
+    end
+
     def push(attrs={})
       self.class.push( self.merge(attrs) )
+    end
+
+    def pop
+      self.class.pop
+      self.class.last
     end
 
     def self.last
@@ -32,9 +50,24 @@ module Hamgick
 
 
     def create_canvas(opts={})
-      require 'rvg/rvg'
       Magick::RVG.dpi = 90
-      @canvas = Magick::RVG.new(2.5.in, 2.5.in)
+      self[:canvas] = Magick::RVG.new(2.5.in, 2.5.in)
+    end
+
+    def canvas
+      self[:canvas]
+    end
+
+    def push_group
+      push(:canvas => canvas.g, :is_group => true)
+    end
+
+    def push_canvas(new_canvas)
+      push(:canvas => new_canvas, :is_group => false)
+    end
+
+    def is_group?
+      self[:is_group]
     end
 
 
