@@ -8,7 +8,12 @@ module HamgickSpecHelper
       @parser = HamgickParser.new(code)
       @parser.precompile
       @image  = @parser.render
-      @image.is_a?(Magick::Image)
+      if @image.is_a?(Magick::Image)
+        @image.write( File.join(RAILS_ROOT, 'tmp', 'rendered_image.png') )
+        true
+      else
+        false
+      end
     end
 
     def failure_message_for_should
