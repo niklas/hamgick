@@ -3,7 +3,7 @@ class HamgickParser
 
   class Line < Struct.new(:text, :index, :precompiler, :eod)
     alias_method :eod?, :eod
-    attr_reader :command, :arguments_or_options
+    attr_accessor :command, :arguments_or_options
 
     def initialize(*args)
       super
@@ -51,11 +51,20 @@ but the rest of the document was indented using #{Haml::Shared.human_indentation
 END
       end
     end
+
+    # FIXME poor detection hash vs. array
+    def evaled_arguments
+      to_eval = if arguments_or_options =~ /[^,]+=>/
+        %Q~{ #{arguments_or_options}  }~
+      else
+        %Q~[ #{arguments_or_options}  ]~
+      end
+      precompiler.instance_eval to_eval
+    end
   end
 
-  COMMAND = %w( )
-  BLOCK   = %w( translate viewbox )
-  SETTER  = %w( background_fill )
+  # commands that need a group to operate on
+  SETTER  = %w( background_fill fill )
 
   def initialize(template, options = {})
     @options = {
@@ -68,6 +77,7 @@ END
   def compile
     @environment = Hamgick::Environment.start
     @newlines = 0
+    @template_tabs = 0
     @line = next_line
     newline
     raise SyntaxError.new("Indenting at the beginning of the document is illegal.", @line.index) if @line.tabs != 0
@@ -85,6 +95,7 @@ END
       @line = @next_line
       newline unless @next_line.eod?
     end
+    close until Hamgick::Environment.almost_empty?
   end
 
   alias_method :precompile, :compile
@@ -94,45 +105,51 @@ END
   end
 
   def process_indent(line)
+    return unless line.tabs <= @template_tabs && @template_tabs > 0
+
+    to_close = @template_tabs - line.tabs
+    to_close.times {|i| close unless to_close - 1 - i == 0}
   end
 
   def process_line(line)
     @index = line.index + 1
-    arguments_or_options = eval_arguments(line.arguments_or_options)
+    arguments_or_options = line.evaled_arguments
 
     case line.command
-    when 'rvg'
+    when 'rvg' # TODO do it lazy
       @environment.create_canvas
-    when *BLOCK
-      if arguments_or_options.is_a?(Hash)
-        @environment.canvas.send(line.command, arguments_or_options  ) do |sub|
-          @environment.push(:canvas => sub)
-        end
-      else
-        @environment.canvas.send(line.command, *arguments_or_options  ) do |sub|
-          @environment.push(:canvas => sub)
-        end
-      end
+      return
+    when 'group'
+      line.command = 'g'
     when *SETTER
-      if arguments_or_options.is_a?(Hash)
-        @environment.canvas.send("#{line.command}=", arguments_or_options)
-      else
-        @environment.canvas.send("#{line.command}=", *arguments_or_options)
-      end
-    when *COMMAND
-      if arguments_or_options.is_a?(Hash)
-        @environment.canvas.send(line.command, arguments_or_options)
-      else
-        @environment.canvas.send(line.command, *arguments_or_options)
-      end
-    else
-      log "-- unknown command in line #{line.index}: #{line.command}"
+      line.command += '='
     end
+
+    result = execute_command(line.command, arguments_or_options)
+    push_canvas(result) if next_line_indented?
+  end
+
+  def execute_command(command, arguments_or_options)
+    if arguments_or_options.is_a?(Hash)
+      @environment.canvas.send(command, arguments_or_options)
+    else
+      @environment.canvas.send(command, *arguments_or_options)
+    end
+  end
+
+  def close
+    @template_tabs -= 1
+    @environment = @environment.pop
   end
 
 
   def render
-    "TODO Render Image"
+    Hamgick::Environment.last.canvas.draw
+  end
+
+  def push_canvas(new_canvas)
+    @template_tabs += 1
+    @environment = @environment.push_canvas(new_canvas)
   end
 
   def next_line
@@ -165,15 +182,6 @@ END
 
   def log(text)
     STDERR.puts text
-  end
-
-  # FIXME poor detection hash vs. array
-  def eval_arguments(string)
-    if string =~ /=>/
-      @environment.instance_eval %Q~{ #{string}  }~
-    else
-      @environment.instance_eval %Q~[ #{string}  ]~
-    end
   end
 
 end

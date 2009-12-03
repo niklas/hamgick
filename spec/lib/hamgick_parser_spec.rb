@@ -49,8 +49,21 @@ describe "Parsing Hamgick" do
     code.should render_an_image
   end
 
-  it "should create a new Magick::RVG" do
-    Magick::RVG.should_receive(:new).and_return(rvg_mock(:draw => true))
+  it "should use Magick::RVG and derivates" do
+    Magick::RVG.should_receive(:new).and_return( rvg = mock('Magick::RVG', :draw => true) )
+    rvg.should_receive(:viewbox).with(0,0,250,250).and_return(rvg)
+    rvg.should_receive(:background_fill=).with('white')
+    rvg.should_receive(:g).and_return( g1 = mock('Magick::RVG::Group'))
+      g1.should_receive(:translate).with(100, 150).and_return( g1 )
+      g1.should_receive(:rotate).with(-30).and_return( g1 )
+      g1.should_receive(:styles).with(:fill => 'yellow', :stroke => 'black', :stroke_width => 2).and_return( g1 )
+      g1.should_receive(:ellipse).with(50,30)
+      g1.should_receive(:rect).with(45, 20, -20, -10).and_return( rect = mock('Magick::RVG::Rect') )
+        rect.should_receive(:fill=).with('orange')
+    
+    rvg.should_receive(:g).and_return( g2 = mock('Magick::RVG::Group'))
+      g2.should_receive(:translate).with(130, 83).and_return( g2 )
+
     render
   end
 
