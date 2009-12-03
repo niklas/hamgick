@@ -4,3 +4,6 @@ Hamgick is the marriage of Imagemagick (rMagick) and HAML.
 
 For know, please look at the hamgick_parser_spec and duck.svg.hamgick to get an idea.
 
+The duck is a more than trivial example how to draw a duck with Magick::RVG. 
+Please look at the original tutorial: http://www.imagemagick.org/RMagick/doc/rvgtut.html
+
