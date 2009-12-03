@@ -64,7 +64,7 @@ END
   end
 
   # commands that need a group to operate on
-  SETTER  = %w( background_fill fill )
+  PROPERTY  = %w( background_fill ).map(&:to_sym)
 
   def initialize(template, options = {})
     @options = {
@@ -108,24 +108,29 @@ END
     return unless line.tabs <= @template_tabs && @template_tabs > 0
 
     to_close = @template_tabs - line.tabs
-    to_close.times {|i| close unless to_close - 1 - i == 0}
+    to_close.times {|i| close }
   end
 
   def process_line(line)
     @index = line.index + 1
     arguments_or_options = line.evaled_arguments
 
-    case line.command
-    when 'rvg' # TODO do it lazy
+    command = line.command.to_sym
+    case command
+    when :rvg # TODO do it lazy
       @environment.create_canvas
+      @template_tabs += 1
       return
-    when 'group'
-      line.command = 'g'
-    when *SETTER
-      line.command += '='
+    when :group
+      command = :g
+    when *Magick::RVG::STYLES
+      arguments_or_options = {command => arguments_or_options.first }
+      command = :styles
+    when *PROPERTY
+      command = :"#{command}="
     end
 
-    result = execute_command(line.command, arguments_or_options)
+    result = execute_command(command, arguments_or_options)
     push_canvas(result) if next_line_indented?
   end
 

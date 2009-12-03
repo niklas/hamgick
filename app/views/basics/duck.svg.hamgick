@@ -13,7 +13,7 @@ rvg
       stroke 'black'
       stroke_width 2
       circle 30
-        fill 'yello'
+        fill 'yellow'
       circle 5, 10, -5
         fill 'black'
       polygon 30,0, 70,5, 30,10, 62,25, 23,20

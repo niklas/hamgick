@@ -53,16 +53,24 @@ describe "Parsing Hamgick" do
     Magick::RVG.should_receive(:new).and_return( rvg = mock('Magick::RVG', :draw => true) )
     rvg.should_receive(:viewbox).with(0,0,250,250).and_return(rvg)
     rvg.should_receive(:background_fill=).with('white')
-    rvg.should_receive(:g).and_return( g1 = mock('Magick::RVG::Group'))
+    rvg.should_receive(:g).and_return( g1 = mock('Magick::RVG::Group_1'))
       g1.should_receive(:translate).with(100, 150).and_return( g1 )
       g1.should_receive(:rotate).with(-30).and_return( g1 )
       g1.should_receive(:styles).with(:fill => 'yellow', :stroke => 'black', :stroke_width => 2).and_return( g1 )
       g1.should_receive(:ellipse).with(50,30)
       g1.should_receive(:rect).with(45, 20, -20, -10).and_return( rect = mock('Magick::RVG::Rect') )
-        rect.should_receive(:fill=).with('orange')
+        rect.should_receive(:styles).with(:fill => 'orange')
     
-    rvg.should_receive(:g).and_return( g2 = mock('Magick::RVG::Group'))
+    rvg.should_receive(:g).and_return( g2 = mock('Magick::RVG::Group_2'))
       g2.should_receive(:translate).with(130, 83).and_return( g2 )
+      g2.should_receive(:styles).with(:stroke => 'black')
+      g2.should_receive(:styles).with(:stroke_width => 2)
+      g2.should_receive(:circle).with(30).and_return( circle = mock('Magick::RVG::Circle') )
+        circle.should_receive(:styles).with(:fill => 'yellow')
+      g2.should_receive(:circle).with(5, 10, -5).and_return( circle = mock('Magick::RVG::Circle') )
+        circle.should_receive(:styles).with(:fill => 'black')
+      g2.should_receive(:polygon).with(30,0, 70,5, 30,10, 62,25, 23,20).and_return( polygon = mock('Magick::RVG::Polygon') )
+        polygon.should_receive(:styles).with(:fill => 'orange')
 
     render
   end
