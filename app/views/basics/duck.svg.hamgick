@@ -7,7 +7,7 @@ rvg
       styles :fill => 'yellow', :stroke => 'black', :stroke_width => 2
       ellipse 50,30
       rect 45, 20, -20, -10
-        fill 'orange'
+        skewX -35
     group
       translate 130, 83
       stroke 'black'

@@ -60,7 +60,7 @@ describe "Parsing Hamgick" do
       g1.should_receive(:styles).with(:fill => 'yellow', :stroke => 'black', :stroke_width => 2).and_return( g1 )
       g1.should_receive(:ellipse).with(50,30)
       g1.should_receive(:rect).with(45, 20, -20, -10).and_return( rect = mock('Magick::RVG::Rect') )
-        rect.should_receive(:styles).with(:fill => 'orange')
+        rect.should_receive(:skewX).with(-35)
     
     rvg.should_receive(:g).and_return( g2 = mock('Magick::RVG::Group_2'))
       g2.should_receive(:translate).with(130, 83).and_return( g2 )
